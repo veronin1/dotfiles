@@ -207,6 +207,16 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
+exec_always --no-startup-id ~/.fehbg
+exec_always --no-startup-id autotiling
 exec_always --no-startup-id ~/.config/polybar/launch.sh
 exec_always picom
+
+# Normal monitor setup
 exec_always xrandr --output DisplayPort-0 --off --output DisplayPort-1 --primary --mode 2560x1440 --rate 240 --pos 1919x0 --rotate normal --output DisplayPort-2 --off --output HDMI-A-0 --mode 1920x1080 --rate 144  --pos 0x0 --rotate normal --output HDMI-A-1-1 --off --output DisplayPort-1-3 --off
+
+# For when my TV is plugged in
+# exec_always xrandr \
+  #--output HDMI-A-0 --mode 3840x2160 --rate 30 --pos 0x0 --rotate normal \
+  #--output DisplayPort-1 --primary --mode 2560x1440 --rate 240 --pos 3840x0 --rotate normal
+

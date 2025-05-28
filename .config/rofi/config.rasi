@@ -1,0 +1,44 @@
+configuration {
+    font: "IBM Plex Mono 14";
+    show-icons: false;
+    display-drun: ">";
+    prompt: ">";
+    opacity: "100";
+    modi: "run,drun";
+}
+
+* {
+    highlight: bold italic;
+    scrollbar: true;
+
+    background:                 #282828;
+    background-color:           #282828;
+    foreground:                 #ebdbb2;
+    border-color:               #a89984;
+    separatorcolor:             #a89984;
+    scrollbar-handle:           #a89984;
+
+    normal-background:           #282828;
+    normal-foreground:           #ebdbb2;
+    alternate-normal-background: #32302f;
+    alternate-normal-foreground: #ebdbb2;
+    selected-normal-background:  #665c54;
+    selected-normal-foreground:  #fbf1c7;
+
+    active-background:           #d79921;
+    active-foreground:           #282828;
+    alternate-active-background: #d79921;
+    alternate-active-foreground: #282828;
+    selected-active-background:  #fabd2f;
+    selected-active-foreground:  #282828;
+
+    urgent-background:           #cc241d;
+    urgent-foreground:           #282828;
+    alternate-urgent-background: #cc241d;
+    alternate-urgent-foreground: #282828;
+    selected-urgent-background:  #fb4934;
+    selected-urgent-foreground:  #282828;
+
+    border: 0;
+    padding: 6px;
+}
