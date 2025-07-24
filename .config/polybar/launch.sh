@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
 polybar-msg cmd quit
-# killall polybar
+killall polybar
 
-while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
+# Wait for polybar processes to fully exit
+while pgrep -u "$UID" -x polybar >/dev/null; do sleep 1; done
 
-polybar main
+# Launch the bar
+polybar top &
+
