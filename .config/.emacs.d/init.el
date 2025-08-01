@@ -35,25 +35,44 @@
 (add-hook 'markdown-mode-hook 'rc/enable-word-wrap)
 
 ;; Enable relative line numbers with absolute current line number
-(setq display-line-numbers-type 'relative) ; use relative numbers
-
-;; Turn on relative line numbers globally
+(setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode t)
+
+(defun jump-n-lines-down (n)
+  "Jump forward N lines."
+  (interactive "nEnter number of lines to jump forward: ")
+  (forward-line n))
+
+(defun jump-n-lines-up (n)
+  "Jump backward N lines."
+  (interactive "nEnter number of lines to jump backward: ")
+  (forward-line (- n)))
+
+(global-set-key (kbd "C-c j") 'jump-n-lines-down)  ;; Ctrl+c j to jump down
+(global-set-key (kbd "C-c k") 'jump-n-lines-up)    ;; Ctrl+c k to jump up
+
 
 ;; LSP configuration for C/C++
 (use-package lsp-mode
-  :hook ((c-mode c++-mode) . lsp)
+  :hook ((c-mode c++-mode python-mode) . lsp)
   :commands lsp
   :config
-  (setq lsp-prefer-flymake nil))
+  (setq lsp-prefer-flymake nil
+        lsp-idle-delay 0.3                             ;; ⬅ reduces CPU load on typing
+        lsp-completion-provider :capf
+        lsp-completion-show-detail t                   ;; ⬅ extra info in completions
+        lsp-completion-show-kind t
+        lsp-headerline-breadcrumb-enable nil           ;; ⬅ disables top bar symbols
+        lsp-enable-symbol-highlighting nil))           ;; ⬅ stops cursor highlight lag
 
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
   :commands lsp-ui-mode
   :config
-  (setq lsp-ui-sideline-enable t
-        lsp-ui-sideline-show-hover t
-        lsp-ui-sideline-show-code-actions t))
+  (setq lsp-ui-sideline-enable nil                     ;; ⬅ kill noisy sideline popups
+        lsp-ui-sideline-show-hover nil
+        lsp-ui-sideline-show-code-actions nil
+        lsp-ui-doc-enable nil))                        ;; ⬅ no floating doc popup lag
 
 (use-package flycheck
   :init (global-flycheck-mode))
@@ -62,12 +81,9 @@
 (use-package company
   :hook (after-init . global-company-mode)
   :config
-  (setq company-minimum-prefix-length 1
-        company-idle-delay 0.0))
-
-;; LSP + Company integration
-(with-eval-after-load 'lsp-mode
-  (setq lsp-completion-provider :capf))
+  (setq company-minimum-prefix-length 2                ;; ⬅ require 2 chars before popup
+        company-idle-delay 0.3                         ;; ⬅ wait a bit before popping up
+        company-show-quick-access t))
 
 ;; Snippets
 (use-package yasnippet
@@ -100,6 +116,26 @@
 
 ;; Theme setting via Custom
 (custom-set-variables
- '(custom-enabled-themes '(gruber-darker)))
+ '(custom-enabled-themes '(gruber-darker))
+ '(package-selected-packages
+   '(blacken clang-format dap-mode flycheck gruber-darker-theme helm-lsp
+	     helm-xref lsp-pyright lsp-ui magit projectile
+	     tree-sitter-langs)))
 
 (custom-set-faces)
+
+;; Python development setup
+
+(use-package lsp-pyright
+  :ensure t
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-pyright)
+                         (lsp))))
+
+(use-package blacken
+  :hook (python-mode . blacken-mode)
+  :config
+  (setq blacken-line-length 88))
+
+(setq python-shell-interpreter "python3")
+(add-hook 'python-mode-hook 'company-mode)
