@@ -1,0 +1,8 @@
+# Ignore Emacs generated files
+.emacs.d/auto-save-list/
+.emacs.d/eln-cache/
+.emacs.d/elpa/
+.emacs.d/transient/
+.emacs.d/tramp/
+.emacs.d/.dap-breakpoints
+.emacs.d/.lsp-session-v1
