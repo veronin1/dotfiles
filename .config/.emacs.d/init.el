@@ -38,18 +38,13 @@
 (setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode t)
 
-(defun jump-n-lines-down (n)
-  "Jump forward N lines."
-  (interactive "nEnter number of lines to jump forward: ")
+;; jump N lines up/down with C-c j
+(defun jump-n-lines (n)
+  "Jump N lines. Negative to go up, positive to jump down."
+  (interactive "nEnter number of lines to jump: ")
   (forward-line n))
 
-(defun jump-n-lines-up (n)
-  "Jump backward N lines."
-  (interactive "nEnter number of lines to jump backward: ")
-  (forward-line (- n)))
-
-(global-set-key (kbd "C-c j") 'jump-n-lines-down)  ;; Ctrl+c j to jump down
-(global-set-key (kbd "C-c k") 'jump-n-lines-up)    ;; Ctrl+c k to jump up
+(global-set-key (kbd "C-c j") 'jump-n-lines)
 
 
 ;; LSP configuration for C/C++
@@ -58,7 +53,7 @@
   :commands lsp
   :config
   (setq lsp-prefer-flymake nil
-        lsp-idle-delay 0.3                             ;; ⬅ reduces CPU load on typing
+        lsp-idle-delay 0.1                             ;; ⬅ reduces CPU load on typing
         lsp-completion-provider :capf
         lsp-completion-show-detail t                   ;; ⬅ extra info in completions
         lsp-completion-show-kind t
@@ -82,7 +77,7 @@
   :hook (after-init . global-company-mode)
   :config
   (setq company-minimum-prefix-length 2                ;; ⬅ require 2 chars before popup
-        company-idle-delay 0.3                         ;; ⬅ wait a bit before popping up
+        company-idle-delay 0.1                         ;; ⬅ wait a bit before popping up
         company-show-quick-access t))
 
 ;; Snippets
