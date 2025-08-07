@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Get battery status for BAT0
+BAT0_STATUS=$(cat /sys/class/power_supply/BAT0/status 2>/dev/null)
+BAT0_CAPACITY=$(cat /sys/class/power_supply/BAT0/capacity 2>/dev/null)
+
+# Get battery status for BAT1
+BAT1_STATUS=$(cat /sys/class/power_supply/BAT1/status 2>/dev/null)
+BAT1_CAPACITY=$(cat /sys/class/power_supply/BAT1/capacity 2>/dev/null)
+
+TOTAL_CAPACITY=0
+BATTERY_COUNT=0
+IS_CHARGING=0
+IS_DISCHARGING=0
+
+# Process BAT0
+if [ -n "$BAT0_CAPACITY" ]; then
+    TOTAL_CAPACITY=$((TOTAL_CAPACITY + BAT0_CAPACITY))
+    BATTERY_COUNT=$((BATTERY_COUNT + 1))
+    if [ "$BAT0_STATUS" = "Charging" ]; then
+        IS_CHARGING=1
+    elif [ "$BAT0_STATUS" = "Discharging" ]; then
+        IS_DISCHARGING=1
+    fi
+fi
+
+# Process BAT1
+if [ -n "$BAT1_CAPACITY" ]; then
+    TOTAL_CAPACITY=$((TOTAL_CAPACITY + BAT1_CAPACITY))
+    BATTERY_COUNT=$((BATTERY_COUNT + 1))
+    if [ "$BAT1_STATUS" = "Charging" ]; then
+        IS_CHARGING=1
+    elif [ "$BAT1_STATUS" = "Discharging" ]; then
+        IS_DISCHARGING=1
+    fi
+fi
+
+# Calculate average capacity
+if [ "$BATTERY_COUNT" -gt 0 ]; then
+    AVERAGE_CAPACITY=$((TOTAL_CAPACITY / BATTERY_COUNT))
+else
+    AVERAGE_CAPACITY=0
+fi
+
+# Define icons - these must be present in your font-2 (FiraCode Nerd Font)
+ICON_CHARGING="" # Charging icon (U+f0e7)
+ICON_DISCHARGING="" # Discharging/Full icon (U+f240)
+
+# Determine output format
+if [ "$IS_CHARGING" -eq 1 ]; then
+    # Output with charging icon
+    echo "%{T2}%{F#89b4fa}$ICON_CHARGING%{F-}%{T-} ${AVERAGE_CAPACITY}%" # Single % here
+elif [ "$IS_DISCHARGING" -eq 1 ] || [ "$AVERAGE_CAPACITY" -gt 0 ]; then
+    # Output with discharging icon
+    echo "%{T2}%{F#89b4fa}$ICON_DISCHARGING%{F-}%{T-} ${AVERAGE_CAPACITY}%" # Single % here
+else
+    # Fallback if no batteries found or unusual state
+    echo "N/A"
+fi
