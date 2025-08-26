@@ -1,136 +1,49 @@
-;;; init.el --- Emacs configuration for C/C++ development
+;;; init.el
 
-;; Package setup
-(require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
+;; load packages
+(load (expand-file-name "packages.el" user-emacs-directory))
 
-;; Bootstrap use-package
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+;; ui
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(column-number-mode 1)
 
-(require 'use-package)
-(setq use-package-always-ensure t)
+;; highlight matching parenthesis
+(show-paren-mode 1)
+(setq show-paren-delay 0)
 
-;; Theme: Gruber Darker
-(use-package gruber-darker-theme
-  :config
-  (load-theme 'gruber-darker t))
-
-;; Font: Iosevka
-(defun rc/get-default-font ()
-  (when (eq system-type 'gnu/linux)
-    "Iosevka-20"))
-
-(set-frame-font (rc/get-default-font) t t)
-
-;; word wrap
-(defun rc/enable-word-wrap ()
-  (interactive)
-  (toggle-word-wrap 1))
-
-(add-hook 'markdown-mode-hook 'rc/enable-word-wrap)
-
-;; Enable relative line numbers with absolute current line number
+;; line numbers
 (setq display-line-numbers-type 'relative)
-(global-display-line-numbers-mode t)
+(global-display-line-numbers-mode 1)
 
-;; jump N lines up/down with C-c j
-(defun jump-n-lines (n)
-  "Jump N lines. Negative to go up, positive to jump down."
-  (interactive "nEnter number of lines to jump: ")
-  (forward-line n))
+;; default font size (20pt)
+set-face-attribute 'default nil :height 200)
 
-(global-set-key (kbd "C-c j") 'jump-n-lines)
+;; disable splash screen and startup message
+(setq inhibit-startup-screen t
+      initial-scratch-message nil)
 
+;; disable the annoying bell
+(setq ring-bell-function 'ignore)
 
-;; LSP configuration for C/C++
-(use-package lsp-mode
-  :hook ((c-mode c++-mode python-mode) . lsp)
-  :commands lsp
-  :config
-  (setq lsp-prefer-flymake nil
-        lsp-idle-delay 0.1                             ;; ⬅ reduces CPU load on typing
-        lsp-completion-provider :capf
-        lsp-completion-show-detail t                   ;; ⬅ extra info in completions
-        lsp-completion-show-kind t
-        lsp-headerline-breadcrumb-enable nil           ;; ⬅ disables top bar symbols
-        lsp-enable-symbol-highlighting nil))           ;; ⬅ stops cursor highlight lag
+;; smooth scrolling
+(setq scroll-step 1
+      scroll-conservatively 10000)
 
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :commands lsp-ui-mode
-  :config
-  (setq lsp-ui-sideline-enable nil                     ;; ⬅ kill noisy sideline popups
-        lsp-ui-sideline-show-hover nil
-        lsp-ui-sideline-show-code-actions nil
-        lsp-ui-doc-enable nil))                        ;; ⬅ no floating doc popup lag
+;; disable backup files and .#lock files
+(setq auto-save-default t
+      make-backup-files nil
+      create-lockfiles nil)
 
-(use-package flycheck
-  :init (global-flycheck-mode))
+;; spaces instead of tabs
+(setq-default indent-tabs-mode nil
+              tab-width 4)
 
-;; Completion
-(use-package company
-  :hook (after-init . global-company-mode)
-  :config
-  (setq company-minimum-prefix-length 2                ;; ⬅ require 2 chars before popup
-        company-idle-delay 0.1                         ;; ⬅ wait a bit before popping up
-        company-show-quick-access t))
-
-;; Snippets
-(use-package yasnippet
-  :init (yas-global-mode 1))
-
-;; Clang-format on save
-(use-package clang-format
-  :commands (clang-format-region clang-format-buffer))
-
-(defun my-c-format-before-save ()
-  (when (or (eq major-mode 'c-mode) (eq major-mode 'c++-mode))
+;; auto clang-format on save for c/c++ buffersx
+(defun my/clang-format-buffer ()
+  "Format the current buffer with clang-format if it's C/C++."
+  (when (derived-mode-p 'c-mode 'c++-mode)
     (clang-format-buffer)))
 
-(add-hook 'before-save-hook #'my-c-format-before-save)
-
-;; Tree-sitter for better syntax parsing
-(use-package tree-sitter
-  :hook ((c-mode c++-mode) . tree-sitter-mode))
-
-(use-package tree-sitter-langs)
-
-;; Git integration
-(use-package magit
-  :commands magit-status
-  :bind ("C-x g" . magit-status))
-
-;; Helpful key discovery
-(use-package which-key
-  :init (which-key-mode))
-
-;; Theme setting via Custom
-(custom-set-variables
- '(custom-enabled-themes '(gruber-darker))
- '(package-selected-packages
-   '(blacken clang-format dap-mode flycheck gruber-darker-theme helm-lsp
-	     helm-xref lsp-pyright lsp-ui magit projectile
-	     tree-sitter-langs)))
-
-(custom-set-faces)
-
-;; Python development setup
-
-(use-package lsp-pyright
-  :ensure t
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-pyright)
-                         (lsp))))
-
-(use-package blacken
-  :hook (python-mode . blacken-mode)
-  :config
-  (setq blacken-line-length 88))
-
-(setq python-shell-interpreter "python3")
-(add-hook 'python-mode-hook 'company-mode)
+(add-hook 'before-save-hook #'my/clang-format-buffer)
