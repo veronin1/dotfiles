@@ -18,7 +18,8 @@
 (global-display-line-numbers-mode 1)
 
 ;; default font size (20pt)
-set-face-attribute 'default nil :height 200)
+(when (and (fboundp 'set-face-attribute) (display-graphic-p))
+  (set-face-attribute 'default nil :family "Fira Code" :height 200))
 
 ;; disable splash screen and startup message
 (setq inhibit-startup-screen t
@@ -47,3 +48,15 @@ set-face-attribute 'default nil :height 200)
     (clang-format-buffer)))
 
 (add-hook 'before-save-hook #'my/clang-format-buffer)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
