@@ -1,0 +1,16 @@
+! Font
+URxvt.font: xft:Iosevka:size=12
+
+! Colors
+URxvt.background: #1e1e2e
+URxvt.foreground: #cdd6f4
+URxvt.cursorColor: #f5c2e7
+
+! Scrollbar
+URxvt.scrollBar: false
+
+! Padding / spacing
+URxvt.internalBorder: 10
+
+! 120 col x 30 row
+URxvt.geometry: 120x30
