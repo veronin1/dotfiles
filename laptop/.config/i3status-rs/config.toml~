@@ -1,0 +1,31 @@
+# i3status-rs config
+
+interval = 5
+output_format = "i3bar"
+colors = true
+
+# Wi-Fi status
+[[block]]
+block = "wifi"
+format = "W: %strength% (%ssid)"
+color = "#ffb86c"
+
+# battery status (bat0 and bat1
+[[block]]
+block = "battery"
+path = "/sys/class/power_supply/BAT0"
+format = "BAT0: %percentage%"
+
+[[block]]
+block = "battery"
+path = "/sys/class/poewr_supply/BAT1"
+format = "BAT1: %percentage%"
+
+# RAM usage
+[[block]]
+block = "memory"
+format = "RAM: %used / %total"
+
+[[block]]
+block = "time"
+format = "%Y-%m-%d %H:%M:%S"

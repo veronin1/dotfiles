@@ -1,0 +1,127 @@
+# i3 config (laptop)
+
+# win key
+set $mod Mod4
+
+# font
+font pango:monospace 12
+
+# make no gaps by default
+gaps inner 0
+gaps outer 0
+
+# new windows/floating default borders
+new_window normal
+new_float normal
+
+# default URxvt behaviour
+for_window [class="URxvt"] focus
+
+# floating modifier
+floating_modifier $mod
+
+# tiling drag
+tiling_drag modifier titlebar
+
+# terminal (rxvt-unicode)
+bindsym $mod+Return exec urxvt
+
+# kill focused window
+bindsym $mod+Shift+q kill
+
+# app launcher (dmenu)
+bindsym $mod+d exec dmenu_run
+
+# window focus
+bindsym $mod+Left focus left
+bindsym $mod+Right focus right
+bindsym $mod+Up focus up
+bindsym $mod+Down focus down
+
+# move focused window
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Right move right
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Down move down
+
+# split orientatons (horiz, vert)
+bindsym $mod+h split h
+bindsym $mod+v split v
+
+# fullscreen
+bindsym $mod+f fullscreen toggle
+
+# layouts
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+
+# tiling/floating toggle
+bindsym $mod+Shift+Space floating toggle
+bindsym $mod+space focus mode_toggle
+
+# parent focus
+bindsym $mod+a focus parent
+
+# workspaces
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+# switch to workspace
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+bindsym $mod+5 workspace $ws5
+bindsym $mod+6 workspace $ws6
+bindsym $mod+7 workspace $ws7
+bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+bindsym $mod+0 workspace $ws10
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+bindsym $mod+Shift+5 move container to workspace $ws5
+bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+7 move container to workspace $ws7
+bindsym $mod+Shift+8 move container to workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9
+bindsym $mod+Shift+0 move container to workspace $ws10
+
+# reload, restart, exit i3
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m "Exit i3?" -B 'Yes' 'i3-msg exit'"
+
+# resize mode
+bindsym $mod+r mode "resize"
+
+mode "resize" {
+    bindsym Left resize shrink width 10 px or 10 ppt
+    bindsym Down resize grow height 10 px or 10 ppt
+    bindsym Up resize shrink height 10 px or 10 ppt
+    bindsym Right resize grow width 10 px or 10 ppt
+
+    bindsym Escape mode "default"
+    bindsym Return mode "default"
+    bindsym $mod+r mode "default"
+}
+
+bar {
+    status_command i3status-rs ~/.config/i3status-rs/config.toml
+    position top
+}
+
+# startup applications
+exec_always --no-startup-id xss-lock -- i3lock

@@ -1,0 +1,31 @@
+# i3status-rs config
+
+# Wi-Fi status
+[[block]]
+block = "net"
+device = "wlp3s0"
+format = "W: $signal_strength ($ssid) $ip"
+
+# battery status (bat0 and bat1)
+[[block]]
+block = "battery"
+device = "BAT0"
+format = "BAT0: $percentage $power"
+
+[[block]]
+block = "battery"
+device = "BAT1"
+format = "BAT1: $percentage $power"
+
+# RAM usage
+[[block]]
+block = "memory"
+format = "RAM: $mem_used / $mem_total"
+
+# time/date (YYYY-MM-DD HH:MM:SS)
+[[block]]
+block = "time"
+interval = 60
+[block.format]
+full = "$timestamp.datetime(f:'%Y-%m-%d %H:%M:%S') "
+short = "$timestamp.datetime(f:'%H:%M:%S') "
