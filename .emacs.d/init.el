@@ -1,5 +1,12 @@
 ;;; init.el
 
+;; delay gc
+(setq gc-cons-threshold 100000000) ;; 100mb
+(add-hook 'emacs-startup-hook
+          (lambda () (setq gc-cons-threshold 800000)))
+
+(setq initial-buffer-choice "~")
+
 ;; load packages
 (load (expand-file-name "packages.el" user-emacs-directory))
 
@@ -18,10 +25,13 @@
 (global-display-line-numbers-mode 1)
 
 ;; default font size (20pt)
-(when (and (fboundp 'set-face-attribute) (display-graphic-p))
-  (set-face-attribute 'default nil :family "Fira Code" :height 200))
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (when (display-graphic-p)
+              (set-face-attribute 'default nil :family "Fira Code" :height 200))))
 
-;; disable splash screen and startup message
+
+;; Disable splash screen and startup message
 (setq inhibit-startup-screen t
       initial-scratch-message nil)
 
@@ -41,22 +51,8 @@
 (setq-default indent-tabs-mode nil
               tab-width 4)
 
-;; auto clang-format on save for c/c++ buffersx
+;; auto clang-format on save for c/c++ buffers
 (defun my/clang-format-buffer ()
   "Format the current buffer with clang-format if it's C/C++."
   (when (derived-mode-p 'c-mode 'c++-mode)
     (clang-format-buffer)))
-
-(add-hook 'before-save-hook #'my/clang-format-buffer)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

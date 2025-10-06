@@ -1,131 +1,95 @@
 ;;; packages.el
 
-;; package system (melpa & gnu)
+;;; package system bootstrap
 (setq package-archives
-      '(("melpa" . "https://melpa.org/packages/")
-        ("gnu"   . "https://elpa.gnu.org/packages/")))
+      '(("gnu"   . "https://elpa.gnu.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")))
 
-;; use-package
+(require 'package)
+(setq package-enable-at-startup nil)
+
+(unless (bound-and-true-p esup-child-process)
+  (unless (file-exists-p (expand-file-name "archives/melpa" package-user-dir))
+    (package-refresh-contents)))
+
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 (require 'use-package)
-(setq use-package-always-ensure t)
+(setq use-package-always-ensure t
+      use-package-always-defer t
+      use-package-verbose nil)
 
-;;; PACKAGES
+;;; theme (load immediately, avoid recursive load)
+(use-package gruber-darker-theme
+  :ensure t
+  :init (load-theme 'gruber-darker t))
 
-;; magit
+;;; general utility
+(use-package esup
+  :commands esup
+  :init (setq esup-depth 0
+              esup-user-init-file (expand-file-name "init.el" user-emacs-directory)))
+
 (use-package magit
   :commands magit-status
   :bind ("C-x g" . magit-status))
 
-;; which-key
 (use-package which-key
-  :config
-  (which-key-mode))
+  :defer 0
+  :config (which-key-mode 1))
 
-;; esup (startup profiling)
-(use-package esup
-  :commands (esup)
-  :defer t)
-
-;; gruber-darker theme
-(use-package gruber-darker-theme
-  :ensure t
-  :init
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (load-theme 'gruber-darker t))))
-
-;; elcord
 (use-package elcord
   :commands elcord-mode
-  :init
-  (which-key-add-key-based-replacements "C-c d" "discord")
+  :init (which-key-add-key-based-replacements "C-c d" "discord")
   :bind (("C-c d t" . elcord-mode)))
-  
 
-;; ide features for c/c++
+;;; note-taking (org-roam)
+(use-package org-roam
+  :commands (org-roam-node-find org-roam-node-insert org-roam-capture org-roam-buffer-toggle)
+  :init (setq org-roam-v2-ack t)
+  :custom (org-roam-directory "~/org-roam")
+  :config (org-roam-db-autosync-mode))
 
-;; company (autocompletion)
+;;; core programming & ide
 (use-package company
-  :commands company-mode
-  :hook (c-mode-common . company-mode)
-  :config
-  (setq company-idle-delay 0.2
-        company-minimum-prefix-length 1))
+  :hook (prog-mode . company-mode)
+  :config (setq company-idle-delay 0.2
+                company-minimum-prefix-length 1))
 
-;; flycheck (syntax checking)
 (use-package flycheck
-  :commands flycheck-mode
-  :hook (c-mode-common . flycheck-mode))
+  :hook (prog-mode . flycheck-mode))
 
-;; lsp mode (language server support)
 (use-package lsp-mode
   :commands lsp
-  :hook ((c-mode c++-mode) . lsp)
-  :init
-  (setq lsp-prefer-flymake nil))
+  :hook (prog-mode . lsp-deferred)
+  :init (setq lsp-prefer-flymake nil)
+  :config (setq lsp-log-io nil
+                lsp-idle-delay 0.5
+                lsp-enable-symbol-highlighting nil
+                lsp-headerline-breadcrumb-enable nil))
 
-;; lsp-ui (enhanced ui)
 (use-package lsp-ui
   :commands lsp-ui-mode
-  :after lsp-mode
-  :hook ((c-mode c++-mode) . lsp-ui-mode)
-  :config
-  (setq lsp-ui-doc-enable t
-        lsp-ui-doc-position 'at-point
-        lsp-ui-sideline-enable t))
+  :hook (lsp-mode . lsp-ui-mode)
+  :config (setq lsp-ui-doc-enable t
+                lsp-ui-doc-position 'at-point
+                lsp-ui-sideline-enable t))
 
-;; quickrun (run code)
 (use-package quickrun
   :commands quickrun
   :bind ("C-c C-r" . quickrun))
 
-
-;;; Python development
-
-;; Python mode (built-in, no extra loading)
-(use-package python
-  :ensure nil
-  :defer t
-  :hook ((python-mode . lsp-deferred)
-         (python-mode . flycheck-mode)
-         (python-mode . company-mode)
-         (python-mode . lsp-ui-mode)))
-
-;; blacken (auto-format with Black)
+;;; language-specific
+;; python
 (use-package blacken
-  :defer t
-  :hook (python-mode . blacken-mode)
-  :config
-  (setq blacken-allow-py36 t))
+  :hook (python-mode . blacken-mode))
 
-;; lsp-pyright (Python LSP)
 (use-package lsp-pyright
-  :defer t
-  :hook (python-mode . lsp-deferred))
+  :after lsp-mode
+  :commands lsp-pyright-enable)
 
-;; Rust development
+;; rust
 (use-package rust-mode
   :mode "\\.rs\\'"
-  :config
-  (setq rust-format-on-save t))
-
-(use-package lsp-mode
-  :hook (rust-mode . lsp-deferred)
-  :config
-  (setq lsp-rust-server 'rust-analyzer
-        lsp-log-io nil
-        lsp-idle-delay 0.5
-        lsp-enable-symbol-highlighting nil
-        lsp-headerline-breadcrumb-enable nil))
-
-(use-package lsp-ui
-  :after lsp-mode
-  :hook (lsp-mode . lsp-ui-mode)
-  :config
-  (setq lsp-ui-doc-enable t
-        lsp-ui-doc-delay 0.2
-        lsp-ui-doc-position 'at-point
-        lsp-ui-sideline-enable nil
-        lsp-ui-imenu-enable nil))
+  :config (setq rust-format-on-save t)
+  :hook (rust-mode . (lambda () (setq lsp-rust-server 'rust-analyzer))))
