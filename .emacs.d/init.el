@@ -1,5 +1,12 @@
 ;;; init.el
 
+;; disable toolbar GUI initialization
+(add-to-list 'default-frame-alist '(tool-bar-lines . 0))
+(add-to-list 'default-frame-alist '(menu-bar-lines . 0))
+(add-to-list 'default-frame-alist '(vertical-scroll-bars . nil))
+
+(setq tool-bar-mode nil)
+
 ;; delay gc
 (setq gc-cons-threshold 100000000) ;; 100mb
 (add-hook 'emacs-startup-hook
@@ -8,12 +15,11 @@
 (setq initial-buffer-choice "~")
 
 ;; load packages
-(load (expand-file-name "packages.el" user-emacs-directory))
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (load (expand-file-name "packages.el" user-emacs-directory))))
 
 ;; ui
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
 (column-number-mode 1)
 
 ;; highlight matching parenthesis
@@ -56,3 +62,17 @@
   "Format the current buffer with clang-format if it's C/C++."
   (when (derived-mode-p 'c-mode 'c++-mode)
     (clang-format-buffer)))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("ee447a6dd4b28851f7cd66f881396ef7cc2169a55d5292fd727f4d3ce783a1ec"
+     default)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
